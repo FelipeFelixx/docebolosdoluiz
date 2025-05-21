@@ -42,11 +42,15 @@
     display: block;
     margin: 0.4rem 0 0.2rem;
   }
-  select, input[type="number"], input[type="text"] {
+  select, input[type="number"], input[type="text"], textarea {
     width: 100%;
     padding: 0.4rem;
     border-radius: 4px;
     border: 1px solid #a87bd1;
+    font-family: Arial, sans-serif;
+  }
+  textarea {
+    resize: vertical;
   }
   button {
     margin-top: 0.8rem;
@@ -152,7 +156,7 @@
 	  <option value="Trufa Ninho" data-preco="4.00">Trufa Ninho– R$4,00</option>
 	  <option value="Trufa Mousse de Maracujá" data-preco="4.00">Trufa Mousse de Maracujá – R$4,00</option>
 	  <option value="Trufa Mousse de Limão" data-preco="4.00">Trufa Mousse de Limão – R$4,00</option>
-	  <option value="Pão de Mel " data-preco="4.00">Pão de Mel – R$8,00</option>
+	  <option value="Pão de Mel " data-preco="8.00">Pão de Mel – R$8,00</option>
 	  <option value="Cone trufado brigadeiro" data-preco="8.00">Cone Trufado Brigadeiro – R$8,00</option>
 	  <option value="Cone trufado ninho" data-preco="8.00">Cone Trufado Ninho – R$8,00</option>
 	  <option value="Cone trufado mousse de maracuja" data-preco="8.00">Cone Trufado Mousse de Maracujá – R$8,00</option>
@@ -160,255 +164,223 @@
 	  <option value="Bolo no Pote-Ninho" data-preco="9.00">Bolo no Pote Ninho – R$9,00</option>
 	  <option value="Bolo no Pote-Beijinho" data-preco="9.00">Bolo no Pote Beijinho– R$9,00</option>
       <option value="Barra trufada Brigadeiro" data-preco="13.99">Barra Trufada Brigadeiro– R$13,99</option>
-	  <option value="Barra trufada Ninho" data-preco="13.99">Barra Trufada Ninho – R$13,99</option>
-	  <option value="Barra trufada Mousse de Maracujá" data-preco="13.99">Barra Trufada Maracujá– R$13,99</option>
+	  <option value="Barra trufada Ninho" data-preco="13.99">Barra Trufada Ninho– R$13,99</option>
     </select>
     <label for="bolo-quantidade">Quantidade:</label>
     <input type="number" id="bolo-quantidade" min="1" value="1" />
-    <button id="add-bolo">Adicionar Bolo/Doce ao Pedido</button>
+    <button id="add-bolo">Adicionar ao Pedido</button>
   </section>
 
   <section id="cart">
-    <h2>🛒 Seu Pedido 🛒</h2>
-    <ul id="cart-items"></ul>
-    <p><strong>Total: R$<span id="cart-total">0.00</span></strong></p>
-  </section>
-</main>
+    <h2>🛒 Pedido🛒 </h2>
+    <ul id="pedido-lista"></ul>
+    <p><strong>Taxa fixa de entrega:</strong> R$5,00</p>
+    <p><strong>Total: R$<span id="total">0.00</span></strong></p>
 
-<section style="max-width: 640px; margin: 1rem auto; background: white; border-radius: 8px; box-shadow: 0 0 10px #d6c1e0; padding: 1rem;">
-  <h2>&#128221; Finalizar Pedido &#128221;</h2>
-  <form id="final-form">
-  <label for="observacao">Observações:</label>
-<textarea id="observacao" rows="3" placeholder="Ex: Trufa sabor morango, sem chantilly, etc." style="width: 100%; padding: 0.4rem; border: 1px solid #a87bd1; border-radius: 4px;"></textarea>
-    <label for="address">Endereço de entrega:</label>
-    <input type="text" id="address" placeholder="Rua, Número, Bairro" required />
+    <label for="endereco">Endereço para entrega:</label>
+    <input type="text" id="endereco" placeholder="Digite seu endereço completo" />
 
-    <label for="payment">Forma de pagamento:</label>
-    <select id="payment" required>
+    <label for="observacoes">Observações:</label>
+    <textarea id="observacoes" rows="3" placeholder="Digite aqui alguma observação para o pedido..."></textarea>
+
+    <label for="pagamento">Forma de pagamento:</label>
+    <select id="pagamento">
       <option value="" disabled selected>-- Selecione --</option>
-      <option value="Dinheiro">Dinheiro</option>
-      <option value="Cartão">Cartão Credito/Debito</option>
-      <option value="Pix">Pix</option>
+      <option value="dinheiro">Dinheiro</option>
+      <option value="pix">PIX</option>
+      <option value="cartao">Cartão Debito</option>
+	  <option value="cartao">Cartão Credito</option>
     </select>
 
     <div id="troco-container" class="hidden">
-      <label for="troco-need">Precisa de troco?</label>
-      <select id="troco-need">
-        <option value="não">Não</option>
-        <option value="sim">Sim</option>
-      </select>
-
-      <div id="troco-amount-container" class="hidden" style="margin-top: 0.5rem;">
-        <label for="troco-amount">Valor do troco (R$):</label>
-        <input type="number" id="troco-amount" min="0" step="0.01" />
-      </div>
+      <label for="troco">Precisa de troco para quanto?</label>
+      <input type="number" id="troco" min="0" step="0.01" placeholder="Valor para troco" />
     </div>
 
-    <button type="submit">Enviar pedido para WhatsApp</button>
-  </form>
-</section>
+    <button id="finalizar">Finalizar Pedido</button>
+  </section>
+</main>
 
 <footer>
   &copy; 2025 Açaí, Bolos e Doces Delivery do Luiz. Todos os direitos reservados. ❤️
 </footer>
 
 <script>
+  // Habilitar combos e mousses ao escolher o copo de açaí
   const acaiCopo = document.getElementById('acai-copo');
-  const combinacoesFieldset = document.getElementById('combinações');
+  const combosFieldset = document.getElementById('combinações');
   const moussesFieldset = document.getElementById('mousses');
   const addAcaiBtn = document.getElementById('add-acai');
-
+  const pedidoLista = document.getElementById('pedido-lista');
+  const totalEl = document.getElementById('total');
   const boloProduto = document.getElementById('bolo-produto');
   const boloQuantidade = document.getElementById('bolo-quantidade');
   const addBoloBtn = document.getElementById('add-bolo');
-
-  const cartItems = document.getElementById('cart-items');
-  const cartTotal = document.getElementById('cart-total');
-
-  const paymentSelect = document.getElementById('payment');
+  const enderecoInput = document.getElementById('endereco');
+  const pagamentoSelect = document.getElementById('pagamento');
   const trocoContainer = document.getElementById('troco-container');
-  const trocoNeedSelect = document.getElementById('troco-need');
-  const trocoAmountContainer = document.getElementById('troco-amount-container');
-  const trocoAmountInput = document.getElementById('troco-amount');
+  const trocoInput = document.getElementById('troco');
+  const finalizarBtn = document.getElementById('finalizar');
+  const observacoesInput = document.getElementById('observacoes');
 
-  let carrinho = [];
+  let pedido = [];
+  const taxaEntrega = 5.00;
 
-  // Ativa combos e mousses só após escolher copo
   acaiCopo.addEventListener('change', () => {
-    if(acaiCopo.value) {
-      combinacoesFieldset.disabled = false;
-      moussesFieldset.disabled = false;
-    } else {
-      combinacoesFieldset.disabled = true;
-      moussesFieldset.disabled = true;
-      clearCombosAndMousses();
-    }
+    combosFieldset.disabled = false;
+    moussesFieldset.disabled = false;
   });
 
-  function clearCombosAndMousses() {
-    document.querySelectorAll('.combo-item').forEach(c => c.checked = false);
-    document.querySelectorAll('.mousse-item').forEach(m => m.checked = false);
-  }
-
-  // Adicionar açaí ao carrinho
-  addAcaiBtn.onclick = () => {
-    if(!acaiCopo.value) {
-      alert('Selecione o copo de açaí primeiro!');
-      return;
-    }
-    const copoText = acaiCopo.options[acaiCopo.selectedIndex].text;
-    const precoCopo = parseFloat(acaiCopo.options[acaiCopo.selectedIndex].dataset.preco);
-
-    let detalhes = [];
-    let precoExtras = 0;
-
-    document.querySelectorAll('.combo-item:checked').forEach(c => {
-      detalhes.push(c.dataset.nome);
-      precoExtras += parseFloat(c.dataset.preco);
-    });
-    document.querySelectorAll('.mousse-item:checked').forEach(m => {
-      detalhes.push(m.dataset.nome);
-      precoExtras += parseFloat(m.dataset.preco);
-    });
-
-    carrinho.push({
-      nome: 'Açaí',
-      detalhes: `${copoText.replace(' – R$' + precoCopo.toFixed(2), '')}${detalhes.length ? ': ' + detalhes.join(', ') : ''}`,
-      preco: precoCopo + precoExtras,
-      quantidade: 1
-    });
-
-    clearCombosAndMousses();
-    acaiCopo.value = '';
-    combinacoesFieldset.disabled = true;
-    moussesFieldset.disabled = true;
-    updateCart();
-  };
-
-  // Adicionar bolo/doce ao carrinho
-  addBoloBtn.onclick = () => {
-    if(!boloProduto.value) {
-      alert('Selecione um produto de bolo/doce!');
-      return;
-    }
-    const produtoText = boloProduto.options[boloProduto.selectedIndex].text;
-    const precoProduto = parseFloat(boloProduto.options[boloProduto.selectedIndex].dataset.preco);
-    const quantidade = parseInt(boloQuantidade.value);
-    if(quantidade < 1 || isNaN(quantidade)) {
-      alert('Informe uma quantidade válida!');
-      return;
-    }
-
-    carrinho.push({
-      nome: produtoText.replace(/ – R\$\d+,\d{2}/, ''),
-      detalhes: '',
-      preco: precoProduto,
-      quantidade: quantidade
-    });
-
-    boloProduto.value = '';
-    boloQuantidade.value = 1;
-    updateCart();
-  };
-
-  // Atualiza visual do carrinho
-  function updateCart() {
-    cartItems.innerHTML = '';
-    let total = 0;
-    carrinho.forEach((item, index) => {
-      const itemTotal = item.preco * item.quantidade;
-      total += itemTotal;
-      const li = document.createElement('li');
-      li.textContent = `${item.nome}${item.detalhes ? ' (' + item.detalhes + ')' : ''} x${item.quantidade} - R$${itemTotal.toFixed(2)}`;
-
-      const btnRemover = document.createElement('button');
-      btnRemover.textContent = 'X';
-      btnRemover.title = 'Remover item';
-      btnRemover.onclick = () => {
-        carrinho.splice(index, 1);
-        updateCart();
-      };
-      li.appendChild(btnRemover);
-      cartItems.appendChild(li);
-    });
-    cartTotal.textContent = total.toFixed(2);
-  }
-
-  // Mostrar/ocultar opções de troco
-  paymentSelect.addEventListener('change', () => {
-    if(paymentSelect.value === 'Dinheiro') {
+  pagamentoSelect.addEventListener('change', () => {
+    if (pagamentoSelect.value === 'dinheiro') {
       trocoContainer.classList.remove('hidden');
     } else {
       trocoContainer.classList.add('hidden');
-      trocoNeedSelect.value = 'não';
-      trocoAmountContainer.classList.add('hidden');
-      trocoAmountInput.value = '';
+      trocoInput.value = '';
     }
   });
 
-  trocoNeedSelect.addEventListener('change', () => {
-    if(trocoNeedSelect.value === 'sim') {
-      trocoAmountContainer.classList.remove('hidden');
-    } else {
-      trocoAmountContainer.classList.add('hidden');
-      trocoAmountInput.value = '';
+  function atualizarTotal() {
+    let total = pedido.reduce((acc, item) => acc + item.precoTotal, 0);
+    total += taxaEntrega;
+    totalEl.textContent = total.toFixed(2);
+  }
+
+  function criarItemPedido(nome, precoUnitario, quantidade) {
+    return {
+      nome,
+      precoUnitario,
+      quantidade,
+      precoTotal: precoUnitario * quantidade,
+    };
+  }
+
+  function adicionarItemNaLista(item) {
+    const li = document.createElement('li');
+    li.textContent = `${item.nome} (x${item.quantidade}) - R$${item.precoTotal.toFixed(2)}`;
+    const btnRemover = document.createElement('button');
+    btnRemover.textContent = 'Excluir';
+    btnRemover.addEventListener('click', () => {
+      const idx = pedido.indexOf(item);
+      if (idx > -1) {
+        pedido.splice(idx, 1);
+        pedidoLista.removeChild(li);
+        atualizarTotal();
+      }
+    });
+    li.appendChild(btnRemover);
+    pedidoLista.appendChild(li);
+  }
+
+  addAcaiBtn.addEventListener('click', () => {
+    const copoSelecionado = acaiCopo.options[acaiCopo.selectedIndex];
+    if (!acaiCopo.value) {
+      alert('Por favor, selecione o copo de açaí.');
+      return;
     }
+    const precoCopo = parseFloat(copoSelecionado.dataset.preco);
+    const nomeCopo = `Açaí ${acaiCopo.value}`;
+
+    // itens combinados
+    const combosSelecionados = Array.from(document.querySelectorAll('.combo-item:checked'));
+    const moussesSelecionados = Array.from(document.querySelectorAll('.mousse-item:checked'));
+
+    // calcular preço combos e mousses
+    let precoCombos = 0;
+    let descricaoCombos = [];
+    combosSelecionados.forEach(c => {
+      precoCombos += parseFloat(c.dataset.preco);
+      descricaoCombos.push(c.dataset.nome);
+    });
+    moussesSelecionados.forEach(m => {
+      precoCombos += parseFloat(m.dataset.preco);
+      descricaoCombos.push(m.dataset.nome);
+    });
+
+    const nomeCompleto = descricaoCombos.length > 0 ? `${nomeCopo} com ${descricaoCombos.join(', ')}` : nomeCopo;
+    const precoTotal = precoCopo + precoCombos;
+
+    const item = criarItemPedido(nomeCompleto, precoTotal, 1);
+    pedido.push(item);
+    adicionarItemNaLista(item);
+    atualizarTotal();
+
+    // Resetar seleção
+    acaiCopo.value = '';
+    combosFieldset.disabled = true;
+    moussesFieldset.disabled = true;
+    document.querySelectorAll('.combo-item').forEach(c => c.checked = false);
+    document.querySelectorAll('.mousse-item').forEach(m => m.checked = false);
   });
 
-  // Form submit - gerar mensagem para WhatsApp
-  document.getElementById('final-form').onsubmit = e => {
-    e.preventDefault();
-    if(carrinho.length === 0) {
-      alert('Seu carrinho está vazio.');
+  addBoloBtn.addEventListener('click', () => {
+    if (!boloProduto.value) {
+      alert('Por favor, selecione o produto.');
       return;
     }
-
-    const address = document.getElementById('address').value.trim();
-    if(!address) {
-      alert('Por favor, informe o endereço de entrega.');
+    const nomeProduto = boloProduto.value;
+    const precoProduto = parseFloat(boloProduto.options[boloProduto.selectedIndex].dataset.preco);
+    const quantidade = parseInt(boloQuantidade.value);
+    if (quantidade < 1) {
+      alert('Quantidade deve ser no mínimo 1.');
       return;
     }
+    const item = criarItemPedido(nomeProduto, precoProduto, quantidade);
+    pedido.push(item);
+    adicionarItemNaLista(item);
+    atualizarTotal();
 
-    const payment = paymentSelect.value;
-    if(!payment) {
+    // Resetar seleção
+    boloProduto.value = '';
+    boloQuantidade.value = 1;
+  });
+
+  finalizarBtn.addEventListener('click', () => {
+    if (pedido.length === 0) {
+      alert('O pedido está vazio. Adicione algum item antes de finalizar.');
+      return;
+    }
+    if (!enderecoInput.value.trim()) {
+      alert('Por favor, informe o endereço para entrega.');
+      return;
+    }
+    if (!pagamentoSelect.value) {
       alert('Por favor, selecione a forma de pagamento.');
       return;
     }
-
-    let trocoMsg = '';
-    if(payment === 'Dinheiro' && trocoNeedSelect.value === 'sim') {
-      const trocoAmount = trocoAmountInput.value.trim();
-      if(!trocoAmount) {
-        alert('Por favor, informe o valor para o troco.');
+    if (pagamentoSelect.value === 'dinheiro' && trocoInput.value.trim() !== '') {
+      const trocoValor = parseFloat(trocoInput.value);
+      if (isNaN(trocoValor) || trocoValor < 0) {
+        alert('Informe um valor válido para o troco.');
         return;
       }
-      trocoMsg = `\n  Troco para: R$${trocoAmount}`;
     }
 
-    // Montar mensagem do pedido com emojis
-    let msg = ` *Pedido de Açaí e Doces do Luiz*  \n\n  *Itens:*`;
-    let total = 0;
-    carrinho.forEach(item => {
-      const itemTotal = item.preco * item.quantidade;
-      total += itemTotal;
-      msg += `\n- ${item.nome}${item.detalhes ? ' ('+item.detalhes+')' : ''} x${item.quantidade} = R$${itemTotal.toFixed(2)}`;
+    let mensagem = '🛒 *Pedido de Açaí, Bolos e Doces do Luiz* 🛒%0A%0A';
+    pedido.forEach(item => {
+      mensagem += `• ${item.nome} (x${item.quantidade}) - R$${item.precoTotal.toFixed(2)}%0A`;
     });
-    msg += `\n\n  *Total:* R$${total.toFixed(2)}`;
-    msg += `\n\n  *Endereço:* ${address}`;
-    msg += `\n  *Pagamento:* ${payment}${trocoMsg}`;
+    mensagem += `%0ATaxa de entrega: R$${taxaEntrega.toFixed(2)}%0A`;
+    const total = pedido.reduce((acc, i) => acc + i.precoTotal, 0) + taxaEntrega;
+    mensagem += `*Total: R$${total.toFixed(2)}*%0A%0A`;
 
-    const encodedMsg = encodeURIComponent(msg);
-	const observacao = document.getElementById('observacao').value.trim();
-if (observacao) {
-  msg += `\n  *Observações:* ${observacao}`;
-}
+    mensagem += `Endereço: ${encodeURIComponent(enderecoInput.value.trim())}%0A`;
 
-    // Troque aqui pelo seu número de WhatsApp no formato internacional sem + (ex: 5511999999999)
-    const telefone = '5535991995490';
+    const observacoes = observacoesInput.value.trim();
+    if (observacoes) {
+      mensagem += `Observações: ${encodeURIComponent(observacoes)}%0A`;
+    }
 
-    const url = `https://wa.me/${telefone}?text=${encodedMsg}`;
-    window.open(url, '_blank');
-  };
+    mensagem += `Pagamento: ${pagamentoSelect.options[pagamentoSelect.selectedIndex].text}%0A`;
+
+    if (pagamentoSelect.value === 'dinheiro' && trocoInput.value.trim() !== '') {
+      mensagem += `Troco para: R$${parseFloat(trocoInput.value).toFixed(2)}%0A`;
+    }
+
+    const telefone = '555991995490'; // troque pelo número real com DDD e sem símbolos
+    const urlWhatsApp = `https://wa.me/${telefone}?text=${mensagem}`;
+    window.open(urlWhatsApp, '_blank');
+  });
 </script>
 
 </body>
